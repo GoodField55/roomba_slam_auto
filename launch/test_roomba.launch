@@ -7,6 +7,6 @@
     <param name="robot_model" value="CREATE_2" />
   </node>
 
-  <node pkg="roomba_slam_auto" name="roomba" type="roomba.py" required="true" />
+  <node pkg="roomba_slam_auto" name="test_roomba" type="test_roomba.py" required="true" />
 
 </launch>
