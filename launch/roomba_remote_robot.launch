@@ -1,0 +1,10 @@
+<launch>
+  <node pkg="pimouse_slam_auto" name="lightsensors" type="lightsensors.py" required="true" />
+  <node pkg="pimouse_slam_auto" name="motors" type="motors.py" required="true" />
+  <node pkg="pimouse_slam_auto" name="wall_random" type="wall_random.py" required="true" />
+
+  <node name="lidar_node" pkg="rplidar_ros" type="rplidarNode" required="true">
+    <param name="serial_port" value="/dev/ttyUSB_RPLIDAR"/>
+    <param name="frame_id" value="base_link" />
+  </node>
+</launch>
