@@ -32,7 +32,7 @@ class Roomba():
     data.linear.x = 0.0		#0.1
     data.angular.z = 0.0
 
-    z = 0.5			#0.5		#math.pi / 3.0
+    z = 0.0			#0.5		#math.pi / 3.0
 
     data.angular.z = z
 
