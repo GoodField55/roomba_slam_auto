@@ -62,9 +62,6 @@ class Roomba():
         self.left_flag = False
         self.right_flag = False
 
-      data.linear.x = 0.0     # dummy
-      data.angular.z = 0.0    #dummy
-
       rospy.loginfo("vel=%f, ang=%f\n", data.linear.x, data.angular.z)
       self.cmd_vel.publish(data)
       rate.sleep()
