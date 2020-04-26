@@ -1,13 +1,4 @@
 <launch>
-  <arg name="config" default="$(find ca_driver)/config/default.yaml" />
-  <arg name="desc" default="false" />
-
-  <node name="ca_driver" pkg="ca_driver" type="ca_driver" output="screen">
-    <rosparam command="load" file="$(arg config)" />
-    <param name="robot_model" value="CREATE_2" />
-  </node>
-
-  <node pkg="roomba_slam_auto" name="roomba" type="roomba.py" required="true" />
 
   <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
   <param name="serial_port"         type="string" value="/dev/ttyUSB_RPLIDAR"/>
@@ -17,5 +8,15 @@
   <param name="inverted"            type="bool"   value="false"/>
   <param name="angle_compensate"    type="bool"   value="true"/>
   </node>
+
+  <arg name="config" default="$(find ca_driver)/config/default.yaml" />
+  <arg name="desc" default="false" />
+
+  <node name="ca_driver" pkg="ca_driver" type="ca_driver" output="screen">
+    <rosparam command="load" file="$(arg config)" />
+    <param name="robot_model" value="CREATE_2" />
+  </node>
+
+  <node pkg="roomba_slam_auto" name="roomba" type="roomba.py" required="true" />
 
 </launch>

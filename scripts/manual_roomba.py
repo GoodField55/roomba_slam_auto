@@ -5,12 +5,12 @@ from std_srvs.srv import Trigger, TriggerResponse
 
 class Roomba():
   def __init__(self):
-    self.cmd_vel = rospy.Publisher('/cmd_vel',Twist,queue_size=1)
+#    self.cmd_vel = rospy.Publisher('/cmd_vel',Twist,queue_size=1)
 
 #    self.sensor_values = LightSensorValues()
 #    rospy.Subscriber('lightsensors', LightSensorValues, self.callback)
 
-#    self.right_flag = False
+    self.right_flag = False   # dummy
 #    self.left_flag = False
 
 #  def callback(self,messages):
@@ -64,8 +64,8 @@ class Roomba():
 #        self.left_flag = False
 #        self.right_flag = False
 
-      rospy.loginfo("vel=%f, ang=%f\n", data.linear.x, data.angular.z)
-      self.cmd_vel.publish(data)
+#      rospy.loginfo("vel=%f, ang=%f\n", data.linear.x, data.angular.z)
+#      self.cmd_vel.publish(data)
       rate.sleep()
 
 if __name__ == '__main__':
