@@ -1,6 +1,12 @@
-# roomba_slam_auto
+# ルンバ　＋　RPLIDAR　で地図を作成
 
-ルンバ　＋　RPLIDAR　で地図を作成
+・キーボード制御版
+　　ルンバを　キーボード　で制御し、地図を作成
+
+・オート版
+　　ルンバが自動で障害物を避け移動しながら、地図を作成
+
+# 操作方法
 
 １．キーボード制御版
 　１－１．ルンバ(RaspberryPi)
@@ -14,5 +20,13 @@
 　　　'l' + 'rteurn' :  時計回り
 　　　'h' + 'return' :  反時計回り
 　　　'return'       :  停止
+
+
+２．オート版
+　２－１．ルンバ(RaspberryPi)
+     roslaunch roomba_remote_robot.launch
+　２－２．PC
+     端末１　roslaunch roomba_remote_desktop.launch
+     端末２　rviz rviz
 
 
