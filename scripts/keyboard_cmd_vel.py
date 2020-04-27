@@ -4,6 +4,7 @@ from geometry_msgs.msg import Twist
 
 rospy.init_node('keyboard_cmd_vel')
 pub = rospy.Publisher('/cmd_vel', Twist, queue_size = 10)
+
 while not rospy.is_shutdown():
   vel = Twist()
   direction = raw_input('k: forward, j: backward, h: left, l: right, return: stop > ')
