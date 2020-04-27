@@ -3,7 +3,7 @@ import rospy
 from geometry_msgs.msg import Twist
 
 rospy.init_node('keyboard_cmd_vel')
-pub = rospy.Publisher('/cmd_vel', Twist, queue_size = 10)
+pub = rospy.Publisher('/cmd_key', Twist, queue_size = 10) # topic to relay key command
 
 while not rospy.is_shutdown():
   vel = Twist()

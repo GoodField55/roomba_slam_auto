@@ -17,6 +17,7 @@
     <param name="robot_model" value="CREATE_2" />
   </node>
 
+  <node pkg="roomba_slam_auto" name="relay_vel" type="relay_key_to_vel.py" required="true" />
   <node pkg="roomba_slam_auto" name="roomba" type="manual_roomba.py" required="true" />
 
   <node pkg="roomba_slam_auto" name="keyboard_cmd_vel" type="keyboard_cmd_vel.py" required="true" />
