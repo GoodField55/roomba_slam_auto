@@ -6,6 +6,12 @@
 ・オート版
 　　ルンバが自動で障害物を避けながら移動し、地図を作成
 
+
+#ルンバ　と　RaspberryPi　の接続
+
+  goodfield55.blog.fc2.com/blog-entry-15.html
+
+
 # 操作方法
 
 １．キーボード制御版
