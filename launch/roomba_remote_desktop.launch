@@ -6,7 +6,7 @@
     <param name="base_frame" value="base_link" />
     <param name="odom_frame" value="odom" />
 
-    <param name="maxUrange" value="4.0" />
+    <param name="maxUrange" value="2.0" />
     <param name="maxRange" value="12.0" />
 
     <param name="srr" value="0.1" />
@@ -14,12 +14,17 @@
     <param name="str" value="0.1" />
     <param name="stt" value="0.1" />
 
-    <param name="particles" value="10" />
+    <param name="particles" value="30" />
 
     <param name="xmin" value="-20" />
     <param name="xmax" value="20" />
     <param name="ymin" value="-20" />
     <param name="ymax" value="20" />
+
+    <param name="llsamplerange" value="0.01" />
+    <param name="llsamplestep" value="0.01" />
+    <param name="lasamplerange" value="0.005" />
+    <param name="lasamplestep" value="0.005" />
 
   </node>
 </launch>

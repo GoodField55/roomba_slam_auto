@@ -9,7 +9,7 @@
 
 # ルンバ　と　RaspberryPi　の接続
 
-  [参考](https://goodfield55.blog.fc2.com/blog-entry-15.html
+  [参考](https://goodfield55.blog.fc2.com/blog-entry-15.html)
 
 
 # 操作方法
