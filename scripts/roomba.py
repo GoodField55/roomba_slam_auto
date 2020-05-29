@@ -51,23 +51,30 @@ class Roomba():
 
     self.counter = 0                    # process counter to goal 
 
+    self.light_signal_threshold = 100           # light signal comparator level
+    self.light_signal_front_threshold = 150     # light signal front comparator level
+    self.light_signal_center_threshold = 200    # light signal center comparator level
+
   def callback_bumper(self,messages):
     self.bumper_values = messages
 
   def callback_cliff(self,messages):
     self.cliff_values = messages
 
+  def wall_detect(self,ls):
+    return ls.light_signal_center_left > self.light_signal_center_threshold or ls.light_signal_center_right > self.light_signal_center_threshold or ls.light_signal_front_left > self.light_signal_front_threshold or ls.light_signal_front_right > self.light_signal_front_threshold or ls.light_signal_left > self.light_signal_threshold or ls.light_signal_right > self.light_signal_threshold
+
   def wall_front(self,ls):
-    return ls.light_signal_center_left > 100 or ls.light_signal_center_right > 100
+    return ls.light_signal_center_left > self.light_signal_threshold or ls.light_signal_center_right > self.light_signal_threshold
 
   def wall_compare(self,ls):    # return true : left>right , false left<right
     return (ls.light_signal_left + ls.light_signal_front_left + ls.light_signal_center_left) > (ls.light_signal_right + ls.light_signal_front_right + ls.light_signal_center_right)
 
   def too_right(self,ls):
-    return ls.light_signal_front_right > 100
+    return ls.light_signal_right > self.light_signal_threshold
 
   def too_left(self,ls):
-    return ls.light_signal_front_left > 100
+    return ls.light_signal_left > self.light_signal_threshold
 
   def bumper_pressed(self,ls):
     return ls.is_left_pressed == True or ls.is_right_pressed == True
@@ -77,7 +84,7 @@ class Roomba():
     rate = rospy.Rate(loop_hz)
     data = Twist()
 
-    x_hi = 0.1   # high speed
+    x_hi = 0.2   # high speed
     x_lo = 0.05  # low  speed
     data.linear.x = x_hi
 
@@ -85,21 +92,21 @@ class Roomba():
     z_lo = math.pi / 8.0
     data.angular.z = z_hi
 
-    self.goal_bumper_back = loop_hz * 0.05 / x_hi            # counts to 0.05m
+    self.goal_bumper_back = loop_hz * 0.02 / x_lo            # counts to 0.05m
     self.goal_bumper_turn = loop_hz * math.pi / 4.0 / z_hi  # counts to 90degree
  
-    self.goal_cliff_back = loop_hz * 0.1 / x_hi            # counts to 0.1m
-    self.goal_cliff_turn = loop_hz * math.pi / 8.0 / z_hi  # counts to 45degree
+    self.goal_cliff_back = loop_hz * 0.05 / x_lo            # counts to 0.1m
+    self.goal_cliff_turn = loop_hz * math.pi / 4.0 / z_hi  # counts to 45degree
 
-    self.goal_front_cliff_back = loop_hz * 0.1 / x_hi            # counts to 0.1m
-    self.goal_front_cliff_turn = loop_hz * math.pi / 4.0 / z_hi  # counts to 90degree
+    self.goal_front_cliff_back = loop_hz * 0.05 / x_lo            # counts to 0.1m
+    self.goal_front_cliff_turn = loop_hz * math.pi / 3.0 / z_hi  # counts to 90degree
 
     while not rospy.is_shutdown():
       if self.cliff_values.is_cliff_front_left == True or self.front_left_cliff_back_flag == True or self.front_left_cliff_turn_flag == True : # front left cliff
         if self.front_left_cliff_phase == 0 :  # under back process
           if self.front_left_cliff_back_flag == False : # first time of cliff front left back
             self.counter = 0
-          data.linear.x = -1 * x_hi
+          data.linear.x = -1 * x_lo
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
@@ -135,7 +142,7 @@ class Roomba():
         if self.front_right_cliff_phase == 0 :  # under back process
           if self.front_right_cliff_back_flag == False : # first time of cliff front left back
             self.counter = 0
-          data.linear.x = -1 * x_hi
+          data.linear.x = -1 * x_lo
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
@@ -172,7 +179,7 @@ class Roomba():
         if self.left_cliff_phase == 0 :  # under back process
           if self.left_cliff_back_flag == False : # first time of cliff left back
             self.counter = 0
-          data.linear.x = -1 * x_hi
+          data.linear.x = -1 * x_lo
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
@@ -208,7 +215,7 @@ class Roomba():
         if self.right_cliff_phase == 0 :  # under back process
           if self.right_cliff_back_flag == False : # first time of cliff right back
             self.counter = 0
-          data.linear.x = -1 * x_hi
+          data.linear.x = -1 * x_lo
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
@@ -245,7 +252,7 @@ class Roomba():
         if self.left_bumper_phase == 0 :  # under back process
           if self.left_bumper_back_flag == False : # first time of bumper left back
             self.counter = 0
-          data.linear.x = -1 * x_hi
+          data.linear.x = -1 * x_lo
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
@@ -281,7 +288,7 @@ class Roomba():
         if self.right_bumper_phase == 0 :  # under back process
           if self.right_bumper_back_flag == False : # first time of bumper right back
             self.counter = 0
-          data.linear.x = -1 * x_hi
+          data.linear.x = -1 * x_lo
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
@@ -315,37 +322,43 @@ class Roomba():
             self.right_bumper_phase = 0                  # clear phase
 
       else:  # bumper not pressed & not cliff
-        if self.wall_front(self.bumper_values):
-          if self.right_flag:  # under right turn
-            data.linear.x = x_lo
-            data.angular.z = -1 * z_lo
-            rospy.loginfo("wall_front under right turn")
-          elif self.left_flag:  # under left turn
-            data.linear.x = x_lo
-            data.angular.z = z_lo
-            rospy.loginfo("wall_front under left turn")
-          elif self.wall_compare(self.bumper_values):
-            data.linear.x = x_lo
-            data.angular.z = -1 * z_lo
-            self.left_flag = False
-            self.right_flag = True
-            rospy.loginfo("wall_front right turn")
-          else:
-            data.linear.x = x_lo
-            data.angular.z = z_lo
-            self.left_flag = True
-            self.right_flag = False
-            rospy.loginfo("wall_front left turn")
-        elif self.too_right(self.bumper_values):
-          data.angular.z = z_hi
-          self.left_flag = True
-          self.right_flag = False
-          rospy.loginfo("too_right")
-        elif self.too_left(self.bumper_values):
-          data.angular.z = -1 * z_hi
+#        if self.wall_front(self.bumper_values):
+#          if self.right_flag:  # under right turn
+#            data.linear.x = x_lo
+#            data.angular.z = -1 * z_lo
+#            rospy.loginfo("wall_front under right turn")
+#          elif self.left_flag:  # under left turn
+#            data.linear.x = x_lo
+#            data.angular.z = z_lo
+#            rospy.loginfo("wall_front under left turn")
+#          elif self.wall_compare(self.bumper_values):
+#            data.linear.x = x_lo
+#            data.angular.z = -1 * z_lo
+#            self.left_flag = False
+#            self.right_flag = True
+#            rospy.loginfo("wall_front right turn")
+#          else:
+#            data.linear.x = x_lo
+#            data.angular.z = z_lo
+#            self.left_flag = True
+#            self.right_flag = False
+#            rospy.loginfo("wall_front left turn")
+#        elif self.too_right(self.bumper_values):
+#          data.angular.z = z_hi
+#          self.left_flag = True
+#          self.right_flag = False
+#          rospy.loginfo("too_right")
+#        elif self.too_left(self.bumper_values):
+#          data.angular.z = -1 * z_hi
+#          self.left_flag = False
+#          self.right_flag = True
+#          rospy.loginfo("too_left")
+        if self.wall_detect(self.bumper_values):
+          data.linear.x = x_lo
+          data.angular.z = 0
+          rospy.loginfo("wall_detect")
           self.left_flag = False
-          self.right_flag = True
-          rospy.loginfo("too_left")
+          self.right_flag = False
         else:
           data.linear.x = x_hi
           data.angular.z = 0
