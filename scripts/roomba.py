@@ -80,26 +80,31 @@ class Roomba():
     return ls.is_left_pressed == True or ls.is_right_pressed == True
 
   def run(self):
-    loop_hz = 10 * 10 # boost x10
+    boost = 10
+    loop_hz = 10 * boost # boost x10
     rate = rospy.Rate(loop_hz)
     data = Twist()
 
-    x_hi = 0.2   # high speed
-    x_lo = 0.05  # low  speed
-    data.linear.x = x_hi
+    x_hi = 0.2        # high speed
+    x_lo = 0.05       # low  speed
+    x_start = 0.005   # iniial speed
+    data.linear.x = x_start
+
+    accel_step  = 0.001        # accel step
+    under_accel = False        # true : under accel
 
     z_hi = math.pi / 4.0
     z_lo = math.pi / 8.0
     data.angular.z = z_hi
 
-    self.goal_bumper_back = loop_hz * 0.02 / x_lo            # counts to 0.05m
-    self.goal_bumper_turn = loop_hz * math.pi / 4.0 / z_hi  # counts to 90degree
+    self.goal_bumper_back = loop_hz * 0.02 / x_lo            # counts to 0.02m
+    self.goal_bumper_turn = loop_hz * math.pi / 4.5 / z_hi  # counts to 80degree
  
-    self.goal_cliff_back = loop_hz * 0.05 / x_lo            # counts to 0.1m
-    self.goal_cliff_turn = loop_hz * math.pi / 4.0 / z_hi  # counts to 45degree
+    self.goal_cliff_back = loop_hz * 0.05 / x_lo            # counts to 0.05m
+    self.goal_cliff_turn = loop_hz * math.pi / 4.5 / z_hi  # counts to 80degree
 
-    self.goal_front_cliff_back = loop_hz * 0.05 / x_lo            # counts to 0.1m
-    self.goal_front_cliff_turn = loop_hz * math.pi / 3.0 / z_hi  # counts to 90degree
+    self.goal_front_cliff_back = loop_hz * 0.05 / x_lo            # counts to 0.05m
+    self.goal_front_cliff_turn = loop_hz * math.pi / 3.3 / z_hi  # counts to 110degree
 
     while not rospy.is_shutdown():
       if self.cliff_values.is_cliff_front_left == True or self.front_left_cliff_back_flag == True or self.front_left_cliff_turn_flag == True : # front left cliff
@@ -108,6 +113,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = -1 * x_lo
           data.angular.z = 0
+          under_accel = False
           self.left_flag = False
           self.right_flag = False
           self.front_left_cliff_back_flag = True
@@ -123,6 +129,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = 0
           data.angular.z = -1 * z_hi
+          under_accel = False
           self.left_flag = False
           self.right_flag = True
           self.front_left_cliff_turn_flag = True
@@ -131,7 +138,7 @@ class Roomba():
           self.counter += 1
           rospy.loginfo("cliff_front_left turn : %d",self.counter)
           if self.counter > self.goal_front_cliff_turn :  # stop turn
-            data.linear.x = x_hi
+            data.linear.x = 0 # x_hi
             data.angular.z = 0
             self.left_flag = False
             self.right_flag = False
@@ -144,6 +151,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = -1 * x_lo
           data.angular.z = 0
+          under_accel = False
           self.left_flag = False
           self.right_flag = False
           self.front_left_cliff_back_flag = False
@@ -159,6 +167,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = 0
           data.angular.z = z_hi
+          under_accel = False
           self.left_flag = True
           self.right_flag = False
           self.front_left_cliff_turn_flag = False
@@ -167,7 +176,7 @@ class Roomba():
           self.counter += 1
           rospy.loginfo("cliff_front_left turn : %d",self.counter)
           if self.counter > self.goal_front_cliff_turn :  # stop turn
-            data.linear.x = x_hi
+            data.linear.x = 0 # x_hi
             data.angular.z = 0
             self.left_flag = False
             self.right_flag = False
@@ -181,6 +190,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = -1 * x_lo
           data.angular.z = 0
+          under_accel = False
           self.left_flag = False
           self.right_flag = False
           self.left_cliff_back_flag = True
@@ -196,6 +206,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = 0
           data.angular.z = -1 * z_hi
+          under_accel = False
           self.left_flag = False
           self.right_flag = True
           self.left_cliff_turn_flag = True
@@ -204,7 +215,7 @@ class Roomba():
           self.counter += 1
           rospy.loginfo("cliff_left turn : %d",self.counter)
           if self.counter > self.goal_cliff_turn :  # stop turn
-            data.linear.x = x_hi
+            data.linear.x = 0 # x_hi
             data.angular.z = 0
             self.left_flag = False
             self.right_flag = False
@@ -217,6 +228,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = -1 * x_lo
           data.angular.z = 0
+          under_accel = False
           self.left_flag = False
           self.right_flag = False
           self.left_cliff_back_flag = False
@@ -232,6 +244,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = 0
           data.angular.z = z_hi
+          under_accel = False
           self.left_flag = True
           self.right_flag = False
           self.left_cliff_turn_flag = False
@@ -240,7 +253,7 @@ class Roomba():
           self.counter += 1
           rospy.loginfo("cliff_right turn : %d",self.counter)
           if self.counter > self.goal_cliff_turn :  # stop turn
-            data.linear.x = x_hi
+            data.linear.x = 0 # x_hi
             data.angular.z = 0
             self.left_flag = False
             self.right_flag = False
@@ -254,6 +267,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = -1 * x_lo
           data.angular.z = 0
+          under_accel = False
           self.left_flag = False
           self.right_flag = False
           self.left_bumper_back_flag = True
@@ -269,6 +283,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = 0
           data.angular.z = -1 * z_hi
+          under_accel = False
           self.left_flag = False
           self.right_flag = True
           self.left_bumper_turn_flag = True
@@ -277,7 +292,7 @@ class Roomba():
           self.counter += 1
           rospy.loginfo("bumper_left turn : %d",self.counter)
           if self.counter > self.goal_bumper_turn :  # stop turn
-            data.linear.x = x_hi
+            data.linear.x = 0 # x_hi
             data.angular.z = 0
             self.left_flag = False
             self.right_flag = False
@@ -290,6 +305,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = -1 * x_lo
           data.angular.z = 0
+          under_accel = False
           self.left_flag = False
           self.right_flag = False
           self.left_bumper_back_flag = False
@@ -305,6 +321,7 @@ class Roomba():
             self.counter = 0
           data.linear.x = 0
           data.angular.z = z_hi
+          under_accel = False
           self.left_flag = True
           self.right_flag = False
           self.left_bumper_turn_flag = False
@@ -313,7 +330,7 @@ class Roomba():
           self.counter += 1
           rospy.loginfo("bumper_right turn : %d",self.counter)
           if self.counter > self.goal_bumper_turn :  # stop turn
-            data.linear.x = x_hi
+            data.linear.x = 0 # x_hi
             data.angular.z = 0
             self.left_flag = False
             self.right_flag = False
@@ -356,11 +373,18 @@ class Roomba():
         if self.wall_detect(self.bumper_values):
           data.linear.x = x_lo
           data.angular.z = 0
+          under_accel = False
           rospy.loginfo("wall_detect")
           self.left_flag = False
           self.right_flag = False
         else:
-          data.linear.x = x_hi
+          if under_accel == False:
+            data.linear.x = x_start
+            under_accel = True
+          else:
+            data.linear.x += accel_step
+            if data.linear.x > x_hi :
+              data.linear.x = x_hi
           data.angular.z = 0
           self.left_flag = False
           self.right_flag = False
